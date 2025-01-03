@@ -1,0 +1,456 @@
+----------------------------------------------------
+Vanilla JavaScript Version - index.html
+----------------------------------------------------------
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Meta tags for character encoding and responsive design -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Calculator</title>
+
+    <style>
+        /* Global reset and basic setup */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif; /* Set default font to Arial */
+        }
+
+        /* Body setup: centering the calculator */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh; /* Full viewport height */
+            background-color: #f4f7f6; /* Light background color */
+            padding: 10px;
+            font-size: 16px; /* Base font size */
+        }
+
+        /* Main calculator container styles */
+        #calc-container {
+            background: #333; /* Dark background */
+            border-radius: 20px; /* Rounded corners */
+            padding: 30px;
+            width: 390px; /* Fixed width */
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15); /* Soft shadow */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* Display area (where calculations appear) */
+        #output-screen {
+            width: 100%; /* Full width */
+            padding: 20px;
+            font-size: 2.5rem; /* Larger font for readability */
+            text-align: right; /* Right align text */
+            border: none;
+            background-color: #444; /* Dark background for the screen */
+            color: white; /* White text color */
+            border-radius: 10px; /* Rounded corners */
+            box-shadow: inset 0 5px 10px rgba(0, 0, 0, 0.2); /* Inset shadow for depth */
+            margin-bottom: 20px; /* Space below the screen */
+            letter-spacing: 1px; /* Slight letter spacing */
+        }
+
+        /* Grid setup for calculator buttons */
+        #keypad {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr); /* 4 equal-width columns */
+            gap: 15px; /* Spacing between buttons */
+        }
+
+        /* General button styling */
+        button {
+            width: 70px; /* Button width */
+            height: 70px; /* Button height */
+            border-radius: 15px; /* Rounded corners */
+            border: none;
+            font-size: 1.5rem; /* Larger text */
+            font-weight: bold;
+            color: white; /* Button text color */
+            background-color: #555; /* Button background color */
+            cursor: pointer; /* Pointer cursor on hover */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Button shadow */
+            transition: all 0.3s ease; /* Smooth transition for hover/active states */
+        }
+
+        /* Button hover effect: lighten background */
+        button:hover {
+            background-color: #777;
+        }
+
+        /* Button active effect: darken background */
+        button:active {
+            background-color: #999;
+            box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.3); /* Inset shadow on press */
+        }
+
+        /* Specific button types for different functions */
+        .action-btn {
+            background-color: #f39c12; /* Orange for actions like +, -, etc. */
+        }
+
+        .action-btn:hover {
+            background-color: #e67e22; /* Darker orange on hover */
+        }
+
+        .action-btn:active {
+            background-color: #d35400; /* Even darker orange on active */
+        }
+
+        /* Clear button styling (AC) */
+        .clear-btn {
+            background-color: #e74c3c; /* Red background */
+        }
+
+        .clear-btn:hover {
+            background-color: #c0392b; /* Darker red on hover */
+        }
+
+        .clear-btn:active {
+            background-color: #962d26; /* Even darker red on active */
+        }
+
+        /* Equal button styling (=) */
+        .equal-btn {
+            background-color: #2ecc71; /* Green background */
+        }
+
+        .equal-btn:hover {
+            background-color: #27ae60; /* Darker green on hover */
+        }
+
+        .equal-btn:active {
+            background-color: #1e8449; /* Even darker green on active */
+        }
+
+        /* Delete button styling (DEL) */
+        .delete-btn {
+            background-color: #3498db; /* Blue background */
+        }
+
+        .delete-btn:hover {
+            background-color: #2980b9; /* Darker blue on hover */
+        }
+
+        .delete-btn:active {
+            background-color: #1f5f78; /* Even darker blue on active */
+        }
+
+        /* Responsive design: adjust styles for smaller screens */
+        @media (max-width: 400px) {
+            #calc-container {
+                width: 90%; /* Reduce width for small screens */
+                padding: 20px;
+            }
+
+            #output-screen {
+                font-size: 2.2rem; /* Smaller font for small screens */
+            }
+
+            button {
+                font-size: 1.4rem; /* Smaller font size for buttons */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Calculator container -->
+    <div id="calc-container">
+        <!-- Display screen for output -->
+        <input id="output-screen" readonly>
+
+        <!-- Calculator keypad (buttons) -->
+        <div id="keypad">
+            <!-- Clear button (AC) -->
+            <button onclick="clearOutput()" class="clear-btn">AC</button>
+            <!-- Square root button -->
+            <button onclick="performSquareRoot()">√</button>
+            <!-- Exponentiation button -->
+            <button onclick="appendToOutput('^')">^</button>
+            <!-- Delete last character button -->
+            <button onclick="removeLastCharacter()" class="delete-btn">DEL</button>
+
+            <!-- Number buttons (7 to 3) -->
+            <button onclick="appendToOutput('7')">7</button>
+            <button onclick="appendToOutput('8')">8</button>
+            <button onclick="appendToOutput('9')">9</button>
+            <!-- Addition button -->
+            <button onclick="appendToOutput('+')" class="action-btn">+</button>
+
+            <button onclick="appendToOutput('4')">4</button>
+            <button onclick="appendToOutput('5')">5</button>
+            <button onclick="appendToOutput('6')">6</button>
+            <!-- Subtraction button -->
+            <button onclick="appendToOutput('-')" class="action-btn">-</button>
+
+            <button onclick="appendToOutput('1')">1</button>
+            <button onclick="appendToOutput('2')">2</button>
+            <button onclick="appendToOutput('3')">3</button>
+            <!-- Multiplication button -->
+            <button onclick="appendToOutput('*')" class="action-btn">×</button>
+
+            <button onclick="appendToOutput('0')">0</button>
+            <!-- Decimal point button -->
+            <button onclick="appendToOutput('.')">.</button>
+            <!-- Equals button -->
+            <button onclick="calculateResult()" class="equal-btn">=</button>
+            <!-- Division button -->
+            <button onclick="appendToOutput('/')" class="action-btn">÷</button>
+        </div>
+    </div>
+
+    <script>
+        // Select the display screen
+        const outputScreen = document.getElementById("output-screen");
+
+        // Function to append values to the screen
+        function appendToOutput(value) {
+            outputScreen.value += value;
+        }
+
+        // Function to clear the display screen
+        function clearOutput() {
+            outputScreen.value = "";
+        }
+
+        // Function to calculate the result
+        function calculateResult() {
+            try {
+                // Replace custom exponentiation symbol with JavaScript's **
+                outputScreen.value = outputScreen.value.replace(/\*\*/g, '^');
+                outputScreen.value = eval(outputScreen.value.replace('^', '**')); // Evaluate the expression
+            } catch (error) {
+                outputScreen.value = "Error"; // Display error if evaluation fails
+            }
+        }
+
+        // Function to perform square root operation
+        function performSquareRoot() {
+            outputScreen.value = Math.sqrt(parseFloat(outputScreen.value)).toString();
+        }
+
+        // Function to remove the last character from the screen
+        function removeLastCharacter() {
+            outputScreen.value = outputScreen.value.slice(0, -1);
+        }
+    </script>
+
+</body>
+</html>
+----------------------------------------------------------
+
+
+
+
+-------------------------------------------------------------------
+React Version - App.jsx
+---------------------------------------------------------
+import React, { useState } from 'react';
+import './App.css'; // Import the CSS file
+
+const AdvancedCalculator = () => {
+  const [outputValue, setOutputValue] = useState('');
+
+  const appendToOutput = (value) => {
+    setOutputValue(prevValue => prevValue + value);
+  };
+
+  const clearOutput = () => {
+    setOutputValue('');
+  };
+
+  const calculateResult = () => {
+    try {
+      // Replace custom exponentiation symbol with JavaScript's **
+      const processedValue = outputValue.replace(/\^/g, '**');
+      setOutputValue(String(eval(processedValue)));
+    } catch (error) {
+      setOutputValue('Error');
+    }
+  };
+
+  const performSquareRoot = () => {
+    try {
+      const result = Math.sqrt(parseFloat(outputValue));
+      setOutputValue(String(result));
+    } catch (error) {
+      setOutputValue('Error');
+    }
+  };
+
+  const removeLastCharacter = () => {
+    setOutputValue(prevValue => prevValue.slice(0, -1));
+  };
+
+  // Function to get button classes based on type
+  const getButtonClasses = (baseColor) => {
+    return `calculator-button ${baseColor}`;
+  };
+
+  return (
+    <div 
+      style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        backgroundColor: '#f4f7f6',
+        padding: '10px'
+      }}
+    >
+      <div 
+        style={{
+          background: '#333',
+          borderRadius: '20px',
+          padding: '30px',
+          width: '390px',
+          boxShadow: '0 5px 20px rgba(0, 0, 0, 0.15)',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between'
+        }}
+      >
+        <input 
+          type="text" 
+          value={outputValue}
+          readOnly 
+          style={{
+            width: '100%',
+            padding: '20px',
+            fontSize: '2.5rem',
+            textAlign: 'right',
+            border: 'none',
+            backgroundColor: '#444',
+            color: 'white',
+            borderRadius: '10px',
+            boxShadow: 'inset 0 5px 10px rgba(0, 0, 0, 0.2)',
+            marginBottom: '20px',
+            letterSpacing: '1px'
+          }}
+        />
+
+        <div 
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(4, 1fr)',
+            gap: '15px'
+          }}
+        >
+          {/* Clear Button */}
+          <button 
+            onClick={clearOutput}
+            className={getButtonClasses('clear-btn')}
+            style={{ '--base-color': '#e74c3c' }}
+          >
+            AC
+          </button>
+
+          {/* Square Root Button */}
+          <button 
+            onClick={performSquareRoot}
+            className={getButtonClasses('default-btn')}
+            style={{ '--base-color': '#555' }}
+          >
+            √
+          </button>
+
+          {/* Exponentiation Button */}
+          <button 
+            onClick={() => appendToOutput('^')}
+            className={getButtonClasses('default-btn')}
+            style={{ '--base-color': '#555' }}
+          >
+            ^
+          </button>
+
+          {/* Delete Button */}
+          <button 
+            onClick={removeLastCharacter}
+            className={getButtonClasses('delete-btn')}
+            style={{ '--base-color': '#3498db' }}
+          >
+            DEL
+          </button>
+
+          {/* Number and Operation Buttons */}
+          {[
+            '7', '8', '9', '+',
+            '4', '5', '6', '-',
+            '1', '2', '3', '×',
+            '0', '.', '=', '÷'
+          ].map((btn) => (
+            <button
+              key={btn}
+              onClick={() => {
+                if (btn === '=') calculateResult();
+                else if (btn === '×') appendToOutput('*');
+                else if (btn === '÷') appendToOutput('/');
+                else appendToOutput(btn);
+              }}
+              className={getButtonClasses(
+                ['+', '-', '×', '÷'].includes(btn) 
+                  ? 'action-btn' 
+                  : btn === '=' 
+                    ? 'equal-btn' 
+                    : 'number-btn'
+              )}
+              style={{ 
+                '--base-color': 
+                  ['+', '-', '×', '÷'].includes(btn) 
+                    ? '#f39c12' 
+                    : btn === '=' 
+                      ? '#2ecc71' 
+                      : '#555' 
+              }}
+            >
+              {btn}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default AdvancedCalculator;
+
+--------------------------------------------------------------
+
+
+.calculator-button {
+  --c: #fff; /* text color */
+  background: linear-gradient(90deg, #0000 33%, #fff5, #0000 67%) var(--_p,100%)/300% no-repeat, var(--base-color);
+  color: transparent;
+  border: none;
+  transform: perspective(500px) rotateY(calc(20deg*var(--_i,-1)));
+  text-shadow: calc(var(-_i,-1)* 0.08em) -.01em 0 var(--c), calc(var(-_i,-1)*-0.08em) .01em 2px #0004;
+  outline-offset: .1em;
+  transition: 0.3s;
+  width: 70px;
+  height: 70px;
+  border-radius: 15px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.calculator-button:hover,
+.calculator-button:focus-visible {
+  --_p: 0%;
+  --_i: 1;
+}
+
+.calculator-button:active {
+  text-shadow: none;
+  color: var(--c);
+  box-shadow: inset 0 0 9e9q #0005;
+  transition: 0s;
+}
+
+------------------------------------------------
